@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace MonoDroid.ActivityResult
 {
+
     public class ActivityResultListener : IActivityResultListener
     {
         private readonly ConcurrentQueue<ActivityResultData> _results;
@@ -14,19 +15,6 @@ namespace MonoDroid.ActivityResult
             _results = new ConcurrentQueue<ActivityResultData>();
         }
 
-        protected struct ActivityResultData
-        {
-            public ActivityResultData(int requestCode, Result resultCode, Intent data)
-            {
-                RequestCode = requestCode;
-                ResultCode = resultCode;
-                Data = data;
-            }
-
-            public int RequestCode;
-            public Result ResultCode;
-            public Intent Data;
-        }
 
         public void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {

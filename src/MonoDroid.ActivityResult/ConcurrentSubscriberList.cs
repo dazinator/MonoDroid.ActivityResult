@@ -29,12 +29,14 @@ namespace MonoDroid.ActivityResult
 
         public void NotifyAll(Action<T> notifyAction)
         {
+            T[] items;
             using (_activityResultlistenersLock.Read())
             {
-                foreach (var item in _listeners)
-                {
-                    notifyAction(item);
-                }
+                items = _listeners.ToArray();
+            }
+            foreach (var item in items)
+            {
+                notifyAction(item);
             }
         }
     }
