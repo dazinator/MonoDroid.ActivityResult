@@ -3,3 +3,6 @@
 ################################################################################
 
 /src/.vs/MonoDroid.ActivityResult/v15
+/src/MonoDroid.ActivityResult/bin/Debug
+/src/MonoDroid.ActivityResult/obj/Debug
+/src/MonoDroid.ActivityResult/MonoDroid.ActivityResult.csproj.user
