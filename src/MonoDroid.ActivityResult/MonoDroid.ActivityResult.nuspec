@@ -1,0 +1,16 @@
+﻿<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <version>$version$</version>
+    <authors>Darrell Tunnell</authors>
+    <owners>Darrell Tunnell</owners>
+    <licenseUrl>https://github.com/dazinator/Xamarin.Standard/licence.md</licenseUrl>
+    <projectUrl>https://github.com/dazinator/Xamarin.Standard</projectUrl>
+    <id>MonoDroid.ActivityResult</id>
+    <title>MonoDroid ActivityResult</title>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A library for intercepting activity result for xamarin android apps.</description>
+    <summary>A library for intercepting activity result for xamarin android apps.</summary>
+    <copyright>Darrell Tunnell</copyright>          
+  </metadata>
+</package>

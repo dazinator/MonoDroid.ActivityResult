@@ -6,7 +6,7 @@ namespace MonoDroid.ActivityResult
 {
     public class ConcurrentSubscriberList<T>
     {
-        private readonly List<T> _listeners;
+        private readonly List<T> _listeners = new List<T>();
         private ReaderWriterLockSlim _activityResultlistenersLock = new ReaderWriterLockSlim();
 
         public void Add(T subscriber)
