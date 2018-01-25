@@ -9,10 +9,10 @@ namespace MonoDroid.ActivityResult
     {
 
         private int _requestCode;
-        private Action<ActivityResultData> _onMatch;
+        private Action<RequestCodeMatchActivityResultListener, ActivityResultData> _onMatch;
         private DelegateActivityResultListener _wrapped;
 
-        public RequestCodeMatchActivityResultListener(int requestCode, Action<ActivityResultData> onMatch)
+        public RequestCodeMatchActivityResultListener(int requestCode, Action<RequestCodeMatchActivityResultListener, ActivityResultData> onMatch)
 
         {
             _wrapped = new DelegateActivityResultListener(ProcessResult);
@@ -24,13 +24,13 @@ namespace MonoDroid.ActivityResult
         {
             if (result.RequestCode == _requestCode)
             {
-                this.OnMatch(result);
+                this.OnMatch(this, result);
             }
         }
 
-        protected virtual void OnMatch(ActivityResultData result)
+        protected virtual void OnMatch(RequestCodeMatchActivityResultListener listener, ActivityResultData result)
         {
-            _onMatch(result);          
+            _onMatch(listener, result);          
         }
 
         public void OnActivityResult(int requestCode, Result resultCode, Intent data)
