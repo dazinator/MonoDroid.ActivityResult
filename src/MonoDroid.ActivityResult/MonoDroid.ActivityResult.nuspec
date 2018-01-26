@@ -4,8 +4,8 @@
     <version>$version$</version>
     <authors>Darrell Tunnell</authors>
     <owners>Darrell Tunnell</owners>
-    <licenseUrl>https://github.com/dazinator/Xamarin.Standard/licence.md</licenseUrl>
-    <projectUrl>https://github.com/dazinator/Xamarin.Standard</projectUrl>
+    <licenseUrl>https://github.com/dazinator/MonoDroid.ActivityResult/licence.md</licenseUrl>
+    <projectUrl>https://github.com/dazinator/MonoDroid.ActivityResult</projectUrl>
     <id>MonoDroid.ActivityResult</id>
     <title>MonoDroid ActivityResult</title>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
