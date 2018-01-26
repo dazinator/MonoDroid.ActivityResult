@@ -79,7 +79,7 @@ namespace MonoDroid.ActivityResult
             var t1 = Task.Run(() => { _requestPermissionResultListeners.NotifyAll((item) => { item.ProcessResults(); }); });
             var t2 = Task.Run(() => { _activityResultListeners.NotifyAll((item) => { item.ProcessResults(); }); });
             var t3 = Task.Run(() => { _processors.NotifyAll((item) => { item.ProcessResults(); }); });
-            await Task.WhenAll(t1, t2);          
+            await Task.WhenAll(t1, t2, t3);          
         }      
     }
 }
