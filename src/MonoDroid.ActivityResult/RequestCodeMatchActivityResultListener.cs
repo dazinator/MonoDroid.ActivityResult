@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 namespace MonoDroid.ActivityResult
 {
+
+
     public class RequestCodeMatchActivityResultListener : IActivityResultListener
     {
 
@@ -30,7 +32,7 @@ namespace MonoDroid.ActivityResult
 
         protected virtual void OnMatch(RequestCodeMatchActivityResultListener listener, ActivityResultData result)
         {
-            _onMatch(listener, result);          
+            _onMatch(listener, result);
         }
 
         public void OnActivityResult(int requestCode, Result resultCode, Intent data)

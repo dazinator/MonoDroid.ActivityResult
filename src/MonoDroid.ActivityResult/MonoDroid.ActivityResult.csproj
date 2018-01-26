@@ -49,11 +49,13 @@
     <Compile Include="ActivityResultData.cs" />
     <Compile Include="ActivityResultInterceptor.cs" />
     <Compile Include="ActivityResultListener.cs" />
+    <Compile Include="BroadcastReceiverListener.cs" />
     <Compile Include="ConcurrentSubscriberList.cs" />
     <Compile Include="DelegateActivityResultListener.cs" />
+    <Compile Include="DelegateBroadcastReceiverListener.cs" />
     <Compile Include="IActivityResultInterceptor.cs" />
     <Compile Include="IActivityResultListener.cs" />
-    <Compile Include="IActivityResultProcessor.cs" />
+    <Compile Include="IDeferredProcessor.cs" />
     <Compile Include="IRequestPermissionsResultListener.cs" />
     <Compile Include="PermissionRequestResultListener.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
