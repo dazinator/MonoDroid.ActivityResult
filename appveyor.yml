@@ -14,6 +14,7 @@ before_build:
 - ps: gitversion /l console /output buildserver
 - cmd: msbuild %path_to_sln% /t:restore /p:PackageVersion=%GitVersion_NuGetVersion%
 - cmd: nuget restore "src/MonoDroid.ActivityResult/MonoDroid.ActivityResult.csproj" -PackagesDirectory "src/packages"
+- cmd: nuget restore "src/MonoDroid.ActivityResult.Sample/MonoDroid.ActivityResult.Sample.csproj" -PackagesDirectory "src/packages"
 build:
   project: '%path_to_sln%'
   verbosity: minimal
