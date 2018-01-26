@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 namespace MonoDroid.ActivityResult
 {
-
-
     public class RequestCodeMatchActivityResultProcessor : IActivityResultProcessor
     {
 

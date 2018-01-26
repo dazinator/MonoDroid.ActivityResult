@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 
 namespace MonoDroid.ActivityResult
 {
-
     public class BroadcastReceiverProcessor : BroadcastReceiver, IResultProcessor
     {
 

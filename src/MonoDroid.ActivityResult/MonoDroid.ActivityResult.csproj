@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivityResultData.cs" />
+    <Compile Include="BroadcastReceiverProcessorCompletion.cs" />
     <Compile Include="CompositeResultProcessor.cs" />
     <Compile Include="ActivityResultProcessor.cs" />
     <Compile Include="BroadcastReceiverProcessor.cs" />
@@ -55,8 +56,10 @@
     <Compile Include="DelegateBroadcastReceiverProcessor.cs" />
     <Compile Include="ICompositeActivityResultProcessor.cs" />
     <Compile Include="IActivityResultProcessor.cs" />
+    <Compile Include="ICompositeProcessorExtensions.cs" />
     <Compile Include="IResultProcessor.cs" />
     <Compile Include="IRequestPermissionsResultProcessor.cs" />
+    <Compile Include="IBroadcastReceiverProcessorCompletion.cs" />
     <Compile Include="RequestPermissionsResultProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReaderWriterLockSlimExtensions.cs" />

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 namespace MonoDroid.ActivityResult
 {
-
     public class ActivityResultProcessor : IActivityResultProcessor
     {
         private readonly ConcurrentQueue<ActivityResultData> _results;

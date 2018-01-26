@@ -1,8 +1,10 @@
 ﻿using Android.Content;
 using System;
+using System.Threading.Tasks;
 
 namespace MonoDroid.ActivityResult
 {
+   // [BroadcastReceiver(Name = "monodroid.activityresult.DelegateBroadcastReceiverProcessor")]
     public class DelegateBroadcastReceiverProcessor : BroadcastReceiverProcessor
     {
         private readonly Action<DelegateBroadcastReceiverProcessor> _onFinished = null;
@@ -12,6 +14,11 @@ namespace MonoDroid.ActivityResult
         {
             _onFinished = onFinished;
             _onProcessResult = onProcessResult;
+        }
+
+        public override Task ProcessResults()
+        {
+            return base.ProcessResults();
         }
 
         protected override void ProcessResult(Intent item)

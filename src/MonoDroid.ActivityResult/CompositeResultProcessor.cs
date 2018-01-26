@@ -12,50 +12,42 @@ namespace MonoDroid.ActivityResult
         private readonly ConcurrentSubscriberList<IActivityResultProcessor> _activityResultListeners;
         private readonly ConcurrentSubscriberList<IRequestPermissionsResultProcessor> _requestPermissionResultListeners;
         private readonly ConcurrentSubscriberList<IResultProcessor> _processors;
-        //  private readonly ConcurrentSubscriberList<IActivityResultProcessor> _allListeners;
 
         public CompositeResultProcessor()
         {
             _activityResultListeners = new ConcurrentSubscriberList<IActivityResultProcessor>();
             _requestPermissionResultListeners = new ConcurrentSubscriberList<IRequestPermissionsResultProcessor>();
             _processors = new ConcurrentSubscriberList<IResultProcessor>();
-            //  _allListeners = new ConcurrentSubscriberList<IActivityResultProcessor>();
         }       
 
         public void Add(IActivityResultProcessor listener)
         {
             _activityResultListeners.Add(listener);
-            // _allListeners.Add(listener);
         }
 
         public void Add(IRequestPermissionsResultProcessor listener)
         {
             _requestPermissionResultListeners.Add(listener);
-            // _allListeners.Add(listener);
         }
 
         public void Add(BroadcastReceiverProcessor processor)
         {
             _processors.Add(processor);
-            // _allListeners.Add(listener);
         }
 
         public void Remove(IActivityResultProcessor listener)
         {
             _activityResultListeners.Remove(listener);
-            // _allListeners.Remove(listener);
         }
 
         public void Remove(IRequestPermissionsResultProcessor listener)
         {
             _requestPermissionResultListeners.Remove(listener);
-            // _allListeners.Remove(listener);
         }
 
         public void Remove(BroadcastReceiverProcessor listener)
         {
             _processors.Remove(listener);
-            // _allListeners.Remove(listener);
         }
 
         public void OnActivityResult(int requestCode, Result resultCode, Intent data)
@@ -72,6 +64,15 @@ namespace MonoDroid.ActivityResult
             {
                 listener.OnRequestPermissionsResult(requestCode, permissions, grantResults);
             });
+        }
+
+        public void Process()
+        {
+            Task.Run(ProcessResults).ConfigureAwait(false);
+            //ProcessResults().ContinueWith((t) =>
+            //{
+            //    var ex = t.Exception;
+            //}).ConfigureAwait(false);
         }
 
         public async Task ProcessResults()

@@ -6,3 +6,7 @@
 /src/MonoDroid.ActivityResult/bin/Debug
 /src/MonoDroid.ActivityResult/obj/Debug
 /src/MonoDroid.ActivityResult/MonoDroid.ActivityResult.csproj.user
+/src/MonoDroid.ActivityResult.Sample/MonoDroid.ActivityResult.Sample.csproj.user
+/src/packages
+/src/MonoDroid.ActivityResult.Sample/obj
+/src/MonoDroid.ActivityResult.Sample/bin/Debug
