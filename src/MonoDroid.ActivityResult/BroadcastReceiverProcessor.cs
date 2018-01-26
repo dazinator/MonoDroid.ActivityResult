@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 namespace MonoDroid.ActivityResult
 {
 
-    public class BroadcastReceiverListener : BroadcastReceiver, IDeferredProcessor
+    public class BroadcastReceiverProcessor : BroadcastReceiver, IResultProcessor
     {
 
         private readonly ConcurrentQueue<Intent> _results;
 
-        public BroadcastReceiverListener()
+        public BroadcastReceiverProcessor()
         {
             _results = new ConcurrentQueue<Intent>();
         }

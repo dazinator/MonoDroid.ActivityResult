@@ -2,7 +2,7 @@
 
 namespace MonoDroid.ActivityResult
 {
-    public interface IDeferredProcessor
+    public interface IResultProcessor
     {
         Task ProcessResults();
     }

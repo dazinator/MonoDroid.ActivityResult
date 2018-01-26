@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace MonoDroid.ActivityResult
 {
-    public class PermissionRequestResultListener : IRequestPermissionsResultListener
+    public class RequestPermissionsResultProcessor : IRequestPermissionsResultProcessor
     {
         private readonly ConcurrentQueue<PermissionRequestResultData> _results;
 
-        public PermissionRequestResultListener()
+        public RequestPermissionsResultProcessor()
         {
             _results = new ConcurrentQueue<PermissionRequestResultData>();
         }

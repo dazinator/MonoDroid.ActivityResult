@@ -2,12 +2,12 @@
 
 namespace MonoDroid.ActivityResult
 {
-    public class DelegateActivityResultListener : ActivityResultListener
+    public class DelegateActivityResultProcessor : ActivityResultProcessor
     {
 
         private Action<ActivityResultData> _onProcesResult;
 
-        public DelegateActivityResultListener(Action<ActivityResultData> onProcesResult)
+        public DelegateActivityResultProcessor(Action<ActivityResultData> onProcesResult)
         {
             _onProcesResult = onProcesResult;
         }

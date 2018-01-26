@@ -7,17 +7,17 @@ namespace MonoDroid.ActivityResult
 {
 
 
-    public class RequestCodeMatchActivityResultListener : IActivityResultListener
+    public class RequestCodeMatchActivityResultProcessor : IActivityResultProcessor
     {
 
         private int _requestCode;
-        private Action<RequestCodeMatchActivityResultListener, ActivityResultData> _onMatch;
-        private DelegateActivityResultListener _wrapped;
+        private Action<RequestCodeMatchActivityResultProcessor, ActivityResultData> _onMatch;
+        private DelegateActivityResultProcessor _wrapped;
 
-        public RequestCodeMatchActivityResultListener(int requestCode, Action<RequestCodeMatchActivityResultListener, ActivityResultData> onMatch)
+        public RequestCodeMatchActivityResultProcessor(int requestCode, Action<RequestCodeMatchActivityResultProcessor, ActivityResultData> onMatch)
 
         {
-            _wrapped = new DelegateActivityResultListener(ProcessResult);
+            _wrapped = new DelegateActivityResultProcessor(ProcessResult);
             _requestCode = requestCode;
             _onMatch = onMatch;
         }
@@ -30,7 +30,7 @@ namespace MonoDroid.ActivityResult
             }
         }
 
-        protected virtual void OnMatch(RequestCodeMatchActivityResultListener listener, ActivityResultData result)
+        protected virtual void OnMatch(RequestCodeMatchActivityResultProcessor listener, ActivityResultData result)
         {
             _onMatch(listener, result);
         }

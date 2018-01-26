@@ -6,53 +6,53 @@ using System.Threading.Tasks;
 
 namespace MonoDroid.ActivityResult
 {
-    public class ActivityResultInterceptor : IActivityResultInterceptor
+    public class CompositeResultProcessor : ICompositeActivityResultProcessor
     {
 
-        private readonly ConcurrentSubscriberList<IActivityResultListener> _activityResultListeners;
-        private readonly ConcurrentSubscriberList<IRequestPermissionsResultListener> _requestPermissionResultListeners;
-        private readonly ConcurrentSubscriberList<IDeferredProcessor> _processors;
+        private readonly ConcurrentSubscriberList<IActivityResultProcessor> _activityResultListeners;
+        private readonly ConcurrentSubscriberList<IRequestPermissionsResultProcessor> _requestPermissionResultListeners;
+        private readonly ConcurrentSubscriberList<IResultProcessor> _processors;
         //  private readonly ConcurrentSubscriberList<IActivityResultProcessor> _allListeners;
 
-        public ActivityResultInterceptor()
+        public CompositeResultProcessor()
         {
-            _activityResultListeners = new ConcurrentSubscriberList<IActivityResultListener>();
-            _requestPermissionResultListeners = new ConcurrentSubscriberList<IRequestPermissionsResultListener>();
-            _processors = new ConcurrentSubscriberList<IDeferredProcessor>();
+            _activityResultListeners = new ConcurrentSubscriberList<IActivityResultProcessor>();
+            _requestPermissionResultListeners = new ConcurrentSubscriberList<IRequestPermissionsResultProcessor>();
+            _processors = new ConcurrentSubscriberList<IResultProcessor>();
             //  _allListeners = new ConcurrentSubscriberList<IActivityResultProcessor>();
         }       
 
-        public void AddListener(IActivityResultListener listener)
+        public void Add(IActivityResultProcessor listener)
         {
             _activityResultListeners.Add(listener);
             // _allListeners.Add(listener);
         }
 
-        public void AddListener(IRequestPermissionsResultListener listener)
+        public void Add(IRequestPermissionsResultProcessor listener)
         {
             _requestPermissionResultListeners.Add(listener);
             // _allListeners.Add(listener);
         }
 
-        public void AddBroadcastReceiver(BroadcastReceiverListener processor)
+        public void Add(BroadcastReceiverProcessor processor)
         {
             _processors.Add(processor);
             // _allListeners.Add(listener);
         }
 
-        public void RemoveListener(IActivityResultListener listener)
+        public void Remove(IActivityResultProcessor listener)
         {
             _activityResultListeners.Remove(listener);
             // _allListeners.Remove(listener);
         }
 
-        public void RemoveListener(IRequestPermissionsResultListener listener)
+        public void Remove(IRequestPermissionsResultProcessor listener)
         {
             _requestPermissionResultListeners.Remove(listener);
             // _allListeners.Remove(listener);
         }
 
-        public void RemoveDeferredProcessor(BroadcastReceiverListener listener)
+        public void Remove(BroadcastReceiverProcessor listener)
         {
             _processors.Remove(listener);
             // _allListeners.Remove(listener);
@@ -80,7 +80,7 @@ namespace MonoDroid.ActivityResult
             var t2 = Task.Run(() => { _activityResultListeners.NotifyAll((item) => { item.ProcessResults(); }); });
             var t3 = Task.Run(() => { _processors.NotifyAll((item) => { item.ProcessResults(); }); });
             await Task.WhenAll(t1, t2);          
-        }
+        }      
     }
 }
 

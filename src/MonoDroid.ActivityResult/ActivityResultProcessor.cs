@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 namespace MonoDroid.ActivityResult
 {
 
-    public class ActivityResultListener : IActivityResultListener
+    public class ActivityResultProcessor : IActivityResultProcessor
     {
         private readonly ConcurrentQueue<ActivityResultData> _results;
 
-        public ActivityResultListener()
+        public ActivityResultProcessor()
         {
             _results = new ConcurrentQueue<ActivityResultData>();
         }

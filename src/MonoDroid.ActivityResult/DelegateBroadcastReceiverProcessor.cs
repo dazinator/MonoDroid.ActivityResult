@@ -3,12 +3,12 @@ using System;
 
 namespace MonoDroid.ActivityResult
 {
-    public class DelegateBroadcastReceiverListener : BroadcastReceiverListener
+    public class DelegateBroadcastReceiverProcessor : BroadcastReceiverProcessor
     {
-        private readonly Action<DelegateBroadcastReceiverListener> _onFinished = null;
+        private readonly Action<DelegateBroadcastReceiverProcessor> _onFinished = null;
         private readonly Action<Intent> _onProcessResult = null;
 
-        public DelegateBroadcastReceiverListener(Action<Intent> onProcessResult, Action<DelegateBroadcastReceiverListener> onFinished = null)
+        public DelegateBroadcastReceiverProcessor(Action<Intent> onProcessResult, Action<DelegateBroadcastReceiverProcessor> onFinished = null)
         {
             _onFinished = onFinished;
             _onProcessResult = onProcessResult;

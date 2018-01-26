@@ -47,20 +47,20 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActivityResultData.cs" />
-    <Compile Include="ActivityResultInterceptor.cs" />
-    <Compile Include="ActivityResultListener.cs" />
-    <Compile Include="BroadcastReceiverListener.cs" />
+    <Compile Include="CompositeResultProcessor.cs" />
+    <Compile Include="ActivityResultProcessor.cs" />
+    <Compile Include="BroadcastReceiverProcessor.cs" />
     <Compile Include="ConcurrentSubscriberList.cs" />
-    <Compile Include="DelegateActivityResultListener.cs" />
-    <Compile Include="DelegateBroadcastReceiverListener.cs" />
-    <Compile Include="IActivityResultInterceptor.cs" />
-    <Compile Include="IActivityResultListener.cs" />
-    <Compile Include="IDeferredProcessor.cs" />
-    <Compile Include="IRequestPermissionsResultListener.cs" />
-    <Compile Include="PermissionRequestResultListener.cs" />
+    <Compile Include="DelegateActivityResultProcessor.cs" />
+    <Compile Include="DelegateBroadcastReceiverProcessor.cs" />
+    <Compile Include="ICompositeActivityResultProcessor.cs" />
+    <Compile Include="IActivityResultProcessor.cs" />
+    <Compile Include="IResultProcessor.cs" />
+    <Compile Include="IRequestPermissionsResultProcessor.cs" />
+    <Compile Include="RequestPermissionsResultProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReaderWriterLockSlimExtensions.cs" />
-    <Compile Include="RequestCodeMatchActivityResultListener.cs" />
+    <Compile Include="RequestCodeMatchActivityResultProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MonoDroid.ActivityResult.nuspec" />
