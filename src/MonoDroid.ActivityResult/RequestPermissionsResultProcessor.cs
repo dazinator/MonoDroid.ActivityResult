@@ -1,31 +1,28 @@
 ﻿using Android.Content.PM;
 using Android.Runtime;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MonoDroid.ActivityResult
 {
-    public class RequestPermissionsResultProcessor : IRequestPermissionsResultProcessor
+    public partial class RequestPermissionsResultProcessor : IRequestPermissionsResultProcessor
     {
         private readonly ConcurrentQueue<PermissionRequestResultData> _results;
+        private readonly CancellationToken _ct;
 
-        public RequestPermissionsResultProcessor()
+        public RequestPermissionsResultProcessor(CancellationToken ct)
         {
             _results = new ConcurrentQueue<PermissionRequestResultData>();
+            _ct = ct;
         }
 
-        protected struct PermissionRequestResultData
+        public CancellationToken CancellationToken
         {
-            public PermissionRequestResultData(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+            get
             {
-                RequestCode = requestCode;
-                Permissions = permissions;
-                GrantResults = grantResults;
+                return _ct;
             }
-
-            public int RequestCode;
-            public string[] Permissions;
-            public Permission[] GrantResults;
         }
 
         public void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)

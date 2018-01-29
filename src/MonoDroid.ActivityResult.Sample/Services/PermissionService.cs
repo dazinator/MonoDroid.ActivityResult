@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Android.App;
 using Android.Content;
@@ -15,12 +16,14 @@ namespace MonoDroid.ActivityResult.Sample.Services
         private readonly IDroidViewLifecycleManager _viewLifecycleManager;
         private ConcurrentDictionary<string, string[]> _permissionGroups;
         private readonly AppContextProvider _appContextProvider;
+        private readonly ICompositeActivityResultProcessor _compositeProcessor;
 
-        public PermissionService(IDroidViewLifecycleManager viewLifecycleManager, AppContextProvider appContextProvider)
-        {          
+        public PermissionService(ICompositeActivityResultProcessor compositeProcessor, IDroidViewLifecycleManager viewLifecycleManager, AppContextProvider appContextProvider)
+        {
             _viewLifecycleManager = viewLifecycleManager;
             _appContextProvider = appContextProvider;
             _permissionGroups = new ConcurrentDictionary<string, string[]>();
+            _compositeProcessor = compositeProcessor;
         }
 
         private Context GetCurrentContext()
@@ -51,11 +54,11 @@ namespace MonoDroid.ActivityResult.Sample.Services
                 return false;
             });
 
-            return Task.FromResult <bool>(!isMissing);     
-           
+            return Task.FromResult<bool>(!isMissing);
+
         }
 
-        public Task<bool> RequestPermissionsAsync(string permissionGroupName, int? requestCode = null)
+        public Task<bool> RequestPermissionsAsync(string permissionGroupName, CancellationToken ct)
         {
             var topActivity = _viewLifecycleManager.GetCurrentActivity();
             if (topActivity == null)
@@ -63,10 +66,39 @@ namespace MonoDroid.ActivityResult.Sample.Services
                 return Task.FromResult(false);
             }
 
+            var requestCode = permissionGroupName.GetHashCode();
             string[] permissions = _permissionGroups[permissionGroupName];
-            topActivity.RequestPermissions(permissions, requestCode.GetValueOrDefault(permissionGroupName.GetHashCode()));
+            var completion = _compositeProcessor.CompleteUsingRequestPermissionsProcessor<bool>((result, c) =>
+            {
+                if (result.RequestCode == requestCode)
+                {
+                    if (result.GrantResults == null)
+                    {
+                        // should not happen
+                        c.Complete(false);
+                        return;
+                    }
 
-            return Task.FromResult(true);
+                    // check all permissions granted?
+                    foreach (Android.Content.PM.Permission item in result.GrantResults)
+                    {
+                        if (item == Android.Content.PM.Permission.Denied)
+                        {
+                            // user denied permission.
+                            c.Complete(false);
+                            return;
+                        }
+                    }
+
+                    // todo: verify matching request code.. AllPermissionsRequestCode
+                    c.Complete(true);
+                    return;
+                }
+            }, ct);
+
+            completion.Register();
+            topActivity.RequestPermissions(permissions, requestCode);
+            return completion.GetTask();
         }
 
         public async Task<bool> HaveAllPermissionsAsync()
@@ -84,33 +116,70 @@ namespace MonoDroid.ActivityResult.Sample.Services
             return true;
         }
 
-        public async Task<bool> RequestAllPermissionsAsync()
+        private async Task<string[]> GetAllMissingPermissions()
         {
-
-            var topActivity = _viewLifecycleManager.GetCurrentActivity();
-            if (topActivity == null)
-            {
-                throw new InvalidOperationException("No current activity.");
-            }
-
-            var standardPermissions = new List<string>();
-
+            var missingPermissions = new List<string>();
             var keys = _permissionGroups.Keys;
             foreach (var key in keys)
             {
                 bool hasPermissions = await HavePermissionsAsync(key);
                 if (!hasPermissions)
                 {
-                    standardPermissions.AddRange(_permissionGroups[key]);
+                    missingPermissions.AddRange(_permissionGroups[key]);
                 }
             }
 
-            if (standardPermissions.Count > 0)
+            return missingPermissions.ToArray();
+        }
+
+        public async Task<bool> RequestAllPermissionsAsync(CancellationToken ct)
+        {
+            var topActivity = _viewLifecycleManager.GetCurrentActivity();
+            if (topActivity == null)
             {
-                topActivity.RequestPermissions(standardPermissions.ToArray(), AllPermissionsRequestCode);
+                throw new InvalidOperationException("No current activity.");
             }
 
-            return true;
+            var missing = await GetAllMissingPermissions();
+            if (!missing.Any())
+            {
+                return true;
+            }
+
+            var requestCode = AllPermissionsRequestCode;
+            var completion = _compositeProcessor.CompleteUsingRequestPermissionsProcessor<bool>((result, c) =>
+            {
+                if (result.RequestCode == requestCode)
+                {
+
+                    if (result.GrantResults == null)
+                    {
+                        // should not happen
+                        c.Complete(false);
+                        return;
+                    }
+
+                    // check all permissions granted?
+                    foreach (Android.Content.PM.Permission item in result.GrantResults)
+                    {
+                        if (item == Android.Content.PM.Permission.Denied)
+                        {
+                            // user denied permission.
+                            c.Complete(false);
+                            return;
+                        }
+                    }
+
+                    // todo: verify matching request code.. AllPermissionsRequestCode
+                    c.Complete(true);
+                    return;
+                }
+
+            }, ct);
+
+            completion.Register();
+            topActivity.RequestPermissions(missing, requestCode);
+            return await completion.GetTask();
         }
 
         public void SetPermissionGroup(string permissionGroupName, string[] permissionsInGroup)

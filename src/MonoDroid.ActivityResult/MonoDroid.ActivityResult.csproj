@@ -54,12 +54,17 @@
     <Compile Include="ConcurrentSubscriberList.cs" />
     <Compile Include="DelegateActivityResultProcessor.cs" />
     <Compile Include="DelegateBroadcastReceiverProcessor.cs" />
+    <Compile Include="DelegatePermissionsResultProcessor.cs" />
     <Compile Include="ICompositeActivityResultProcessor.cs" />
     <Compile Include="IActivityResultProcessor.cs" />
     <Compile Include="ICompositeProcessorExtensions.cs" />
+    <Compile Include="IRequestPermissionsProcessorCompletion.cs" />
     <Compile Include="IResultProcessor.cs" />
     <Compile Include="IRequestPermissionsResultProcessor.cs" />
     <Compile Include="IBroadcastReceiverProcessorCompletion.cs" />
+    <Compile Include="PermissionRequestResultData.cs" />
+    <Compile Include="ActivityResultProcessorCompletion.cs" />
+    <Compile Include="RequestPermissionsProcessorCompletion.cs" />
     <Compile Include="RequestPermissionsResultProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReaderWriterLockSlimExtensions.cs" />

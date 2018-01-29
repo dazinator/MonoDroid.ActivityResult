@@ -1,4 +1,5 @@
 ﻿using Android.Content;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MonoDroid.ActivityResult
@@ -11,10 +12,21 @@ namespace MonoDroid.ActivityResult
 
         void Unregister();
 
+        CancellationToken CancellationToken
+        {
+            get;
+        }
+
         bool IsRegistered
         {
             get;
         }
+
+        bool IsCompleted
+        {
+            get;
+        }
+
 
         Task<TResult> GetTask();
     }

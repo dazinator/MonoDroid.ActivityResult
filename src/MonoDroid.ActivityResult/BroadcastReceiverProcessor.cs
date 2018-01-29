@@ -1,5 +1,6 @@
 ﻿using Android.Content;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MonoDroid.ActivityResult
@@ -8,26 +9,47 @@ namespace MonoDroid.ActivityResult
     {
 
         private readonly ConcurrentQueue<Intent> _results;
+        private readonly CancellationToken _ct;
 
-        public BroadcastReceiverProcessor()
+        public BroadcastReceiverProcessor(CancellationToken ct)
         {
             _results = new ConcurrentQueue<Intent>();
+            _ct = ct;
         }
 
         public override void OnReceive(Context context, Intent intent)
         {
-            _results.Enqueue(intent);     
+            _results.Enqueue(intent);
+        }
+
+        public CancellationToken CancellationToken
+        {
+            get
+            {
+                return _ct;
+            }
         }
 
         public virtual Task ProcessResults()
         {
-            while (!_results.IsEmpty)
+            if (!_ct.IsCancellationRequested)
             {
-                Intent item;
-                if (_results.TryDequeue(out item))
+                while (!_results.IsEmpty)
                 {
-                    ProcessResult(item);
+                    if (!_ct.IsCancellationRequested)
+                    {
+                        Intent item;
+                        if (_results.TryDequeue(out item))
+                        {
+                            ProcessResult(item);
+                        }
+                    }
+                    else
+                    {
+                        _ct.ThrowIfCancellationRequested();
+                    }
                 }
+
             }
 
             Finished();
@@ -36,9 +58,9 @@ namespace MonoDroid.ActivityResult
 
         protected virtual void ProcessResult(Intent item)
         {
-          //  throw new NotImplementedException();
-        }    
-        
+            //  throw new NotImplementedException();
+        }
+
         protected virtual void Finished()
         {
 

@@ -1,37 +1,35 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Android.Content;
 
 namespace MonoDroid.ActivityResult
 {
-
-    public class BroadcastReceiverProcessorCompletion<TResult> : IBroadcastReceiverProcessorCompletion<TResult>
+    public class ActivityResultProcessorCompletion<TResult> : IRequestPermissionsProcessorCompletion<TResult>
     {
         private readonly TaskCompletionSource<TResult> _tcs;
         private readonly ICompositeActivityResultProcessor _processor;
-        private readonly BroadcastReceiverProcessor _broadcaster;
-        private Context _context;
-        private readonly Action<Intent, BroadcastReceiverProcessorCompletion<TResult>> _checkResultForCompletionCallback;
         private readonly CancellationToken _ct;
+        private readonly DelegateActivityResultProcessor _itemProcessor;
+
+        private readonly Action<ActivityResultData, ActivityResultProcessorCompletion<TResult>> _checkResultForCompletionCallback;
         private bool _isRegistered = false;
         private readonly object _lock = new object();
 
-
-        public BroadcastReceiverProcessorCompletion(TaskCompletionSource<TResult> tcs, ICompositeActivityResultProcessor processor, Action<Intent, BroadcastReceiverProcessorCompletion<TResult>> checkResultForCompletionCallback, CancellationToken ct)
+        public ActivityResultProcessorCompletion(TaskCompletionSource<TResult> tcs, ICompositeActivityResultProcessor processor, Action<ActivityResultData, ActivityResultProcessorCompletion<TResult>> checkResultForCompletionCallback, CancellationToken ct)
         {
             _tcs = tcs;
             _checkResultForCompletionCallback = checkResultForCompletionCallback;
-            _ct = ct;
             _processor = processor;
-            // _onCancelled = onCancelled;
-            _broadcaster = new DelegateBroadcastReceiverProcessor((intentResult) =>
+            _ct = ct;
+
+            _itemProcessor = new DelegateActivityResultProcessor((intentResult) =>
             {
                 checkResultForCompletionCallback(intentResult, this);
-            }, ct);           
+            }, _ct);
         }
 
-        public void Register(IntentFilter filter, Context context)
+
+        public void Register()
         {
             if (!_isRegistered)
             {
@@ -39,11 +37,8 @@ namespace MonoDroid.ActivityResult
                 {
                     if (!_isRegistered)
                     {
-                        _processor.Add(_broadcaster);
-                        _context = context;
-                        context.RegisterReceiver(_broadcaster, filter);
+                        _processor.Add(_itemProcessor);
                         _isRegistered = true;
-
                     }
                     else
                     {
@@ -66,16 +61,6 @@ namespace MonoDroid.ActivityResult
             }
         }
 
-        public CancellationToken CancellationToken
-        {
-            get
-            {
-                return _ct;
-            }
-        }
-
-        public bool IsCompleted => _tcs.Task.IsCompleted;
-
         public void Unregister()
         {
             if (_isRegistered)
@@ -84,9 +69,7 @@ namespace MonoDroid.ActivityResult
                 {
                     if (_isRegistered)
                     {
-                        _processor.Remove(_broadcaster);
-                        _context.UnregisterReceiver(_broadcaster);
-                        _context = null;
+                        _processor.Remove(_itemProcessor);
                         _isRegistered = false;
                     }
                 }
@@ -97,6 +80,7 @@ namespace MonoDroid.ActivityResult
         {
             try
             {
+                // Don't try and set the result if the tcs has already been cancelled.
                 if (!_ct.IsCancellationRequested)
                 {
                     _tcs.SetResult(result);
@@ -112,9 +96,8 @@ namespace MonoDroid.ActivityResult
                 {
                     Unregister();
                 }
-            }
+            }                
         }
-
 
         public Task<TResult> GetTask()
         {

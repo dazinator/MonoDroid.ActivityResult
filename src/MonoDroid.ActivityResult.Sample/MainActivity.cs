@@ -12,6 +12,9 @@ using MonoDroid.ActivityResult.Sample.Services;
 using Android;
 using Android.Views;
 using Java.Interop;
+using Android.Content.PM;
+using Android.Runtime;
+using Android.Content;
 
 namespace MonoDroid.ActivityResult.Sample
 {
@@ -21,6 +24,11 @@ namespace MonoDroid.ActivityResult.Sample
 
         private ICompositeActivityResultProcessor _compositeProcessor;
         private DroidViewLifecycleManager _viewLifecycleManager;
+        private Task<bool> _installTask;
+
+        private const string _downloadUrl = @"https://PUT-DOWNLOAD-URL/FOR-APK-HERE.apk";
+        private const string _apkName = @"[Put the File Name of the APK to be downloaded here]";
+        private const string _packageName = @"[Put the Package Name of the APK to be downloaded here, as in the Manifest]";
 
         public Lazy<IServiceProvider> ServiceProvider
         {
@@ -40,7 +48,7 @@ namespace MonoDroid.ActivityResult.Sample
                 IServiceCollection services = new ServiceCollection();
                 services.AddAndroidHostingEnvironment();
                 services.AddSingleton<ICompositeActivityResultProcessor, CompositeResultProcessor>();
-                services.AddSingleton<InstallService>();             
+                services.AddSingleton<InstallService>();
 
                 return services.BuildServiceProvider();
             });
@@ -51,7 +59,7 @@ namespace MonoDroid.ActivityResult.Sample
             }
 
             // Set our view from the "main" layout resource
-            SetContentView(Resource.Layout.Main);      
+            SetContentView(Resource.Layout.Main);
 
 
         }
@@ -62,37 +70,66 @@ namespace MonoDroid.ActivityResult.Sample
             var button = view as Button;
             button.Text = "Please wait..";
 
-            Foo(() =>
+            DownloadAndInstall((text) =>
            {
-               button.Text = "Package Installed!";
+               button.Text = text;
            }).Forget();
         }
 
-        private async Task Foo(Action onFinished)
+        private async Task DownloadAndInstall(Action<string> setTextCallback)
         {
-            await RequestPermissions();
+            var permissionsGranted = await RequestPermissions();
+            if (!permissionsGranted)
+            {
+                setTextCallback("Permissions Denied..");
+                return;
+            }
 
             var pathToNewFolder = Android.OS.Environment.ExternalStorageDirectory.AbsolutePath + "/MyApk";
             Directory.CreateDirectory(pathToNewFolder);
 
-            var apkName = "put-apk-name-here.apk";
-            var filePath = Path.Combine(pathToNewFolder, apkName);               
+            var apkName = _apkName;
+            var filePath = Path.Combine(pathToNewFolder, apkName);
 
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
             }
 
-            await DownloadFile("https://put-download-url-here", filePath);
-            var installer = new InstallService(_compositeProcessor, _viewLifecycleManager, AppContextProvider.DefaultAppContextProvider);
-            await installer.InstallApkAsync(filePath);
+            setTextCallback("Downloading apk..");
+            await DownloadFile(_downloadUrl, filePath);
+            setTextCallback("Download finished..");
 
-            onFinished?.Invoke();
+            var installer = new InstallService(_compositeProcessor, _viewLifecycleManager, AppContextProvider.DefaultAppContextProvider);
+            setTextCallback("Installing..");
+
+            // var ct = cts.Token;
+        
+            try
+            {
+                _installTask = installer.InstallApkAsync(filePath, _packageName, CancellationToken.None);
+                var installed = await _installTask;
+                if (installed)
+                {
+                    setTextCallback("Package installed!");
+                }
+                else
+                {
+                    setTextCallback("Package not installed!");
+                }
+            }
+            catch (TaskCanceledException c)
+            {
+                // If you were to use a cancellation token and then trigger cancellation!
+                // I am using CancellationToken.None above and dont do any cancellation so this won't be hit.
+                setTextCallback("Package install cancelled!");             
+            }
+
         }
 
-        private async Task RequestPermissions()
+        private async Task<bool> RequestPermissions()
         {
-            var permissionService = new PermissionService(_viewLifecycleManager, AppContextProvider.DefaultAppContextProvider);
+            var permissionService = new PermissionService(_compositeProcessor, _viewLifecycleManager, AppContextProvider.DefaultAppContextProvider);
             permissionService.SetPermissionGroup("Storage", new string[] { Manifest.Permission.ReadExternalStorage, Manifest.Permission.WriteExternalStorage });
             permissionService.SetPermissionGroup("Internet", new string[] { Manifest.Permission.Internet });
             permissionService.SetPermissionGroup("Accounts", new string[] {
@@ -106,7 +143,7 @@ namespace MonoDroid.ActivityResult.Sample
                      Manifest.Permission.ReadUserDictionary,
                  });
 
-            await permissionService.RequestAllPermissionsAsync();
+            return await permissionService.RequestAllPermissionsAsync(CancellationToken.None);
         }
 
         private async Task DownloadFile(string url, string filePath)
@@ -119,7 +156,7 @@ namespace MonoDroid.ActivityResult.Sample
 
             await downloadService.DownloadFileAsync(url, filePath, CancellationToken.None);
         }
-        
+
         protected override void OnResume()
         {
             base.OnResume();
@@ -130,6 +167,18 @@ namespace MonoDroid.ActivityResult.Sample
         {
             _viewLifecycleManager.Unregister();
             base.OnDestroy();
+        }
+
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+        {
+            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+            _compositeProcessor.OnRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+        protected override void OnActivityResult(int requestCode, [GeneratedEnum] Result resultCode, Intent data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+            _compositeProcessor.OnActivityResult(requestCode, resultCode, data);
         }
     }
 }
